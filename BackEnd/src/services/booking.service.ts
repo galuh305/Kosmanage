@@ -471,3 +471,189 @@ export const regenerateActivationToken = async (bookingId: number) => {
     expiresAt: activation.expiresAt,
   };
 };
+
+/**
+ * Membatalkan pemesanan yang SUDAH disetujui (mis. tenant membatalkan lewat
+ * chat sehingga tidak sempat membatalkan dari akunnya sendiri).
+ *
+ * Yang dilakukan (dalam satu transaksi):
+ *  - Booking -> CANCELLED dan kontrak sewa -> CANCELLED
+ *  - Tagihan UNPAID / OVERDUE -> CANCELLED (tagihan PAID tetap sebagai arsip)
+ *  - Pengajuan perpanjangan / pindah yang masih berjalan -> CANCELLED
+ *  - Status kamar dihitung ulang sehingga bisa kembali AVAILABLE
+ *  - Token aktivasi yang belum dipakai dihanguskan
+ */
+export const cancelApprovedBooking = async (id: number) => {
+  return await prisma.$transaction(async (tx) => {
+    const booking = await tx.booking.findUnique({
+      where: { id },
+      include: {
+        room: true,
+        user: true,
+        lease: {
+          include: {
+            invoices: {
+              include: { payments: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!booking) {
+      throw new Error("BOOKING_NOT_FOUND");
+    }
+
+    if (booking.status !== "APPROVED") {
+      throw new Error("BOOKING_NOT_APPROVED");
+    }
+
+    const lease = booking.lease;
+
+    if (!lease) {
+      throw new Error("LEASE_NOT_FOUND");
+    }
+
+    if (lease.status !== "ACTIVE") {
+      throw new Error("LEASE_NOT_ACTIVE");
+    }
+
+    // Bukti transfer yang belum diverifikasi harus diselesaikan dulu,
+    // supaya tidak ada pembayaran "menggantung" pada tagihan yang dibatalkan.
+    const hasPendingPayment = lease.invoices.some((invoice) =>
+      invoice.payments.some(
+        (payment) => payment.transactionStatus === "PENDING_VERIFICATION",
+      ),
+    );
+
+    if (hasPendingPayment) {
+      throw new Error("PAYMENT_PENDING_VERIFICATION");
+    }
+
+    const paidInvoices = lease.invoices.filter(
+      (invoice) => invoice.status === "PAID",
+    ).length;
+
+    const cancellableInvoiceIds = lease.invoices
+      .filter(
+        (invoice) =>
+          invoice.status === "UNPAID" || invoice.status === "OVERDUE",
+      )
+      .map((invoice) => invoice.id);
+
+    // 1. Batalkan tagihan yang belum dibayar
+    if (cancellableInvoiceIds.length > 0) {
+      await tx.invoice.updateMany({
+        where: { id: { in: cancellableInvoiceIds } },
+        data: { status: "CANCELLED" },
+      });
+    }
+
+    // 2. Tutup pengajuan perpanjangan / pindah yang masih berjalan
+    await tx.leaseExtension.updateMany({
+      where: {
+        leaseId: lease.id,
+        status: { in: ["PENDING", "APPROVED"] },
+      },
+      data: { status: "CANCELLED" },
+    });
+
+    await tx.leaseTermination.updateMany({
+      where: {
+        leaseId: lease.id,
+        status: { in: ["PENDING", "APPROVED"] },
+      },
+      data: { status: "CANCELLED" },
+    });
+
+    // 3. Batalkan kontrak sewa dan pemesanan
+    await tx.lease.update({
+      where: { id: lease.id },
+      data: { status: "CANCELLED" },
+    });
+
+    const updatedBooking = await tx.booking.update({
+      where: { id },
+      data: { status: "CANCELLED" },
+      include: {
+        room: {
+          include: {
+            roomType: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            role: true,
+            mustChangePassword: true,
+            activationExpiresAt: true,
+          },
+        },
+      },
+    });
+
+    // 4. Hitung ulang status kamar (logika sama seperti sinkronisasi berkala).
+    //    Kamar yang sedang MAINTENANCE tidak diubah.
+    if (booking.room.status !== "MAINTENANCE") {
+      const now = new Date();
+
+      const remainingLeases = await tx.lease.findMany({
+        where: {
+          roomId: booking.roomId,
+          status: "ACTIVE",
+        },
+      });
+
+      const hasCurrentLease = remainingLeases.some(
+        (item) => item.startDate <= now && item.endDate > now,
+      );
+
+      const hasFutureLease = remainingLeases.some(
+        (item) => item.startDate > now && item.endDate > now,
+      );
+
+      const newRoomStatus = hasCurrentLease
+        ? "OCCUPIED"
+        : hasFutureLease
+          ? "RESERVED"
+          : "AVAILABLE";
+
+      if (booking.room.status !== newRoomStatus) {
+        await tx.room.update({
+          where: { id: booking.roomId },
+          data: { status: newRoomStatus },
+        });
+      }
+    }
+
+    // 5. Hanguskan token aktivasi yang belum dipakai (jika tenant tidak
+    //    punya kontrak aktif lain)
+    if (booking.user && booking.user.mustChangePassword) {
+      const otherActiveLeases = await tx.lease.count({
+        where: {
+          userId: booking.user.id,
+          status: "ACTIVE",
+        },
+      });
+
+      if (otherActiveLeases === 0) {
+        await tx.user.update({
+          where: { id: booking.user.id },
+          data: {
+            activationTokenHash: null,
+            activationExpiresAt: null,
+          },
+        });
+      }
+    }
+
+    return {
+      booking: updatedBooking,
+      cancelledInvoices: cancellableInvoiceIds.length,
+      paidInvoices,
+    };
+  });
+};

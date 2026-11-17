@@ -13,6 +13,7 @@ import {
   getBookings,
   updateBookingStatus,
   regenerateActivationToken,
+  cancelApprovedBooking,
   type Booking,
   type BookingStatus,
 } from "../../services/booking.service";
@@ -142,6 +143,42 @@ function Bookings() {
       }
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal menyetujui pemesanan");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleCancelApproved = async () => {
+    if (!selectedBooking) return;
+
+    const hasStarted =
+      !!selectedBooking.startDate &&
+      new Date(selectedBooking.startDate).getTime() <= Date.now();
+
+    const confirmed = window.confirm(
+      `Batalkan pemesanan ${selectedBooking.guestName} untuk kamar ${selectedBooking.room.roomNumber}?\n\n` +
+        `- Kontrak sewa dibatalkan dan tagihan yang belum dibayar ikut dibatalkan.\n` +
+        `- Status kamar diperbarui sehingga bisa dipesan kembali.\n` +
+        (hasStarted
+          ? `\nPERHATIAN: tanggal mulai sewa sudah lewat. Pastikan tenant memang tidak menempati kamar ini.\n`
+          : "") +
+        `\nTindakan ini tidak dapat dibatalkan.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setProcessing(true);
+
+      const result = await cancelApprovedBooking(selectedBooking.id);
+
+      setSelectedBooking(null);
+
+      await fetchBookings();
+
+      alert(result.pesan);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal membatalkan pemesanan");
     } finally {
       setProcessing(false);
     }
@@ -708,6 +745,16 @@ function Bookings() {
                     {processing ? "Memproses..." : "Tolak Pemesanan"}
                   </button>
                 </>
+              )}
+
+              {selectedBooking.status === "APPROVED" && (
+                <button
+                  onClick={handleCancelApproved}
+                  disabled={processing}
+                  className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {processing ? "Memproses..." : "Batalkan Pemesanan"}
+                </button>
               )}
             </div>
           </div>

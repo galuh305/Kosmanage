@@ -7,6 +7,7 @@ import {
   updateBookingStatus,
   approveBooking,
   regenerateActivationToken,
+  cancelApprovedBooking,
 } from "../services/booking.service";
 
 import { getRoomById } from "../services/room.service";
@@ -337,5 +338,64 @@ export const regenerateActivationTokenController = async (c: Context) => {
     console.error(error)
 
     return c.json({ pesan: 'Gagal membuat token aktivasi' }, 500)
+  }
+}
+
+export const cancelApprovedBookingController = async (c: Context) => {
+  try {
+    const id = Number(c.req.param('id'))
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ pesan: 'ID pemesanan tidak valid' }, 400)
+    }
+
+    const result = await cancelApprovedBooking(id)
+
+    const pesan =
+      result.paidInvoices > 0
+        ? `Pemesanan berhasil dibatalkan dan status kamar diperbarui. Terdapat ${result.paidInvoices} tagihan yang sudah lunas, pengembalian dana (jika ada) perlu diurus secara manual.`
+        : 'Pemesanan berhasil dibatalkan dan status kamar diperbarui'
+
+    return c.json({
+      pesan,
+      data: result.booking,
+      cancelledInvoices: result.cancelledInvoices,
+      paidInvoices: result.paidInvoices,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      const errors: Record<string, { pesan: string; status: 400 | 404 | 409 }> = {
+        BOOKING_NOT_FOUND: {
+          pesan: 'Pemesanan tidak ditemukan',
+          status: 404,
+        },
+        BOOKING_NOT_APPROVED: {
+          pesan: 'Hanya pemesanan yang sudah disetujui yang dapat dibatalkan dengan cara ini',
+          status: 400,
+        },
+        LEASE_NOT_FOUND: {
+          pesan: 'Kontrak sewa untuk pemesanan ini tidak ditemukan',
+          status: 404,
+        },
+        LEASE_NOT_ACTIVE: {
+          pesan: 'Kontrak sewa sudah tidak aktif (selesai, dibatalkan, atau dihentikan)',
+          status: 409,
+        },
+        PAYMENT_PENDING_VERIFICATION: {
+          pesan: 'Masih ada bukti pembayaran yang menunggu verifikasi. Verifikasi atau tolak pembayaran tersebut di menu Pembayaran terlebih dahulu.',
+          status: 409,
+        },
+      }
+
+      const knownError = errors[error.message]
+
+      if (knownError) {
+        return c.json({ pesan: knownError.pesan }, knownError.status)
+      }
+    }
+
+    console.error(error)
+
+    return c.json({ pesan: 'Gagal membatalkan pemesanan' }, 500)
   }
 }

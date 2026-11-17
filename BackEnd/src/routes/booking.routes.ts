@@ -7,6 +7,7 @@ import {
   createBookingController,
   updateBookingStatusController,
   regenerateActivationTokenController,
+  cancelApprovedBookingController,
 } from '../controllers/booking.controller'
 
 import {
@@ -48,6 +49,15 @@ bookingRoutes.post(
   authMiddleware,
   ownerMiddleware,
   regenerateActivationTokenController
+)
+
+// Batalkan pemesanan yang sudah disetujui (kontrak & tagihan ikut dibatalkan,
+// status kamar dikembalikan)
+bookingRoutes.patch(
+  '/:id/cancel',
+  authMiddleware,
+  ownerMiddleware,
+  cancelApprovedBookingController
 )
 
 export default bookingRoutes

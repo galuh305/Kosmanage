@@ -190,3 +190,42 @@ export const regenerateActivationToken = async (
 
   return result
 }
+
+export type CancelApprovedBookingResult = {
+  pesan: string
+  booking: Booking
+  cancelledInvoices: number
+  paidInvoices: number
+}
+
+export const cancelApprovedBooking = async (
+  id: number
+): Promise<CancelApprovedBookingResult> => {
+  const token = localStorage.getItem('kosmanage_token')
+
+  if (!token) {
+    throw new Error('Token tidak ditemukan. Silakan login kembali.')
+  }
+
+  const response = await fetch(`${API_URL}/bookings/${id}/cancel`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  const result = await response.json()
+
+  if (!response.ok || !result.data) {
+    throw new Error(
+      result.pesan || 'Gagal membatalkan pemesanan'
+    )
+  }
+
+  return {
+    pesan: result.pesan,
+    booking: result.data,
+    cancelledInvoices: result.cancelledInvoices ?? 0,
+    paidInvoices: result.paidInvoices ?? 0,
+  }
+}
