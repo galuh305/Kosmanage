@@ -1,38 +1,215 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
-:root {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+/* ==========================================================================
+   DESIGN TOKENS
+   Mengubah token tema Tailwind membuat seluruh halaman ikut berubah
+   (bayangan, radius, latar) tanpa perlu mengedit logika / markup tiap file.
+   ========================================================================== */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Latar netral yang sedikit lebih hangat & lembut */
+  --color-slate-50: #f6f8fc;
+  --color-slate-100: #edf1f7;
+
+  /* Radius sedikit lebih bulat -> terasa lebih ramah */
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.125rem;
+  --radius-3xl: 1.5rem;
+
+  /* Bayangan lembut, bernuansa slate (bukan hitam pekat) */
+  --shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+  --shadow-md: 0 4px 8px -2px rgb(15 23 42 / 0.06), 0 2px 4px -2px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 12px 24px -6px rgb(15 23 42 / 0.08), 0 4px 8px -4px rgb(15 23 42 / 0.04);
+  --shadow-xl: 0 20px 36px -10px rgb(15 23 42 / 0.10), 0 8px 14px -6px rgb(15 23 42 / 0.05);
+  --shadow-2xl: 0 28px 56px -14px rgb(15 23 42 / 0.20);
+
+  /* Utility animasi: animate-fade-up, animate-fade-in, dst. */
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  --animate-fade-in: fade-in 0.2s ease-out backwards;
+  --animate-pop-in: pop-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  --animate-slide-in-left: slide-in-left 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  --animate-grow-y: grow-y 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  --animate-float: float 7s ease-in-out infinite;
 }
 
-html {
-  scroll-behavior: smooth;
+/* ==========================================================================
+   KEYFRAMES
+   (ditaruh di luar @theme supaya selalu ikut ter-generate)
+   fill-mode "backwards" dipakai agar setelah animasi selesai elemen kembali
+   ke gaya aslinya -> efek hover (translate/scale) tidak terganggu.
+   ========================================================================== */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to   { transform: none; }
+}
+@keyframes grow-y {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
+/* ==========================================================================
+   BASE
+   Berada di layer "base" sehingga class utility Tailwind di komponen
+   tetap menang jika sudah menentukan gaya sendiri.
+   ========================================================================== */
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    color: #0f172a;
+    background: var(--color-slate-50);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* agar anchor (#kamar, #fasilitas) tidak tertutup navbar sticky */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  a {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Transisi halus default untuk semua elemen interaktif */
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, box-shadow,
+      opacity, translate, scale;
+    transition-duration: 0.18s;
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Umpan balik tekan: tombol terasa "responsif" */
+  button:not(:disabled):not([class*="inset-0"]):active,
+  a[class*="bg-blue-"]:active {
+    scale: 0.97;
+  }
+
+  /* Fokus keyboard yang jelas namun lembut */
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-blue-500) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  /* Fokus pada field formulir (yang belum punya gaya fokus sendiri) */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([class*="border-0"]):focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--color-blue-500);
+    box-shadow: 0 0 0 4px rgb(59 130 246 / 0.12);
+  }
+
+  ::placeholder {
+    color: var(--color-slate-400);
+  }
+
+  /* Baris tabel: sorotan lembut saat di-hover */
+  tbody tr {
+    transition: background-color 0.15s ease;
+  }
+  tbody tr:hover {
+    background-color: color-mix(in oklab, var(--color-blue-50) 55%, transparent);
+  }
+
+  ::selection {
+    background: #bfdbfe;
+    color: #172554;
+  }
+
+  /* Scrollbar tipis & netral */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-slate-300) transparent;
+  }
 }
 
-button,
-a,
-input,
-select {
-  font: inherit;
+/* ==========================================================================
+   KOMPONEN GLOBAL
+   ========================================================================== */
+
+/* Konten halaman di dalam layout Owner / Tenant masuk dengan fade-up halus.
+   Elemen root halaman adalah node baru tiap pindah rute -> animasi otomatis. */
+.page-enter > * {
+  animation: fade-up 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
-button,
-a {
-  cursor: pointer;
+/* Modal / dialog: overlay fade-in, panel pop-in (pola: fixed inset-0 > panel) */
+.fixed.inset-0.flex.items-center.justify-center {
+  animation: fade-in 0.18s ease-out backwards;
+  backdrop-filter: blur(3px);
+}
+.fixed.inset-0.flex.items-center.justify-center > div {
+  animation: pop-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
-::selection {
-  background: #bfdbfe;
-  color: #172554;
+/* Muncul saat di-scroll (progressive enhancement: hanya browser yang
+   mendukung scroll-driven animation; sisanya tampil normal tanpa efek) */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+
+/* Hormati pengguna yang mematikan animasi di perangkatnya */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

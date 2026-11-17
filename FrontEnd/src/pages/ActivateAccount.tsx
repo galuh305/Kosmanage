@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { KeyRound } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const API_URL = "http://localhost:3000/api";
+import API_URL from "../config/api";
 
 function ActivateAccount() {
   const [token, setToken] = useState("");
@@ -64,10 +65,15 @@ function ActivateAccount() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-sky-100 px-4 py-10">
+      <div className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-blue-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-sky-200/50 blur-3xl" />
+      <div className="animate-fade-up relative w-full max-w-md rounded-3xl border border-white bg-white/90 p-8 shadow-xl shadow-blue-100/60 backdrop-blur sm:p-10">
         <div className="mb-7 text-center">
-          <h1 className="text-2xl font-bold text-slate-800">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-200">
+            <KeyRound size={26} />
+          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
             Aktivasi Akun
           </h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -77,7 +83,7 @@ function ActivateAccount() {
 
         <form onSubmit={handleActivate} className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               Token Aktivasi
             </label>
             <textarea
@@ -86,12 +92,12 @@ function ActivateAccount() {
               placeholder="Masukkan token aktivasi"
               rows={3}
               required
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               Password Baru
             </label>
             <input
@@ -101,12 +107,12 @@ function ActivateAccount() {
               placeholder="Minimal 8 karakter"
               minLength={8}
               required
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               Konfirmasi Password
             </label>
             <input
@@ -116,13 +122,13 @@ function ActivateAccount() {
               placeholder="Ulangi password baru"
               minLength={8}
               required
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             />
           </div>
 
           {message && (
             <div
-              className={`rounded-lg p-3 text-sm ${
+              className={`animate-pop-in rounded-xl p-3 text-sm ${
                 success
                   ? "bg-green-50 text-green-700"
                   : "bg-red-50 text-red-700"
@@ -135,7 +141,7 @@ function ActivateAccount() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
           >
             {loading ? "Mengaktivasi..." : "Aktivasi Akun"}
           </button>

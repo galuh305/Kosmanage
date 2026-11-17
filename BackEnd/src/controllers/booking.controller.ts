@@ -6,6 +6,7 @@ import {
   checkRoomAvailability,
   updateBookingStatus,
   approveBooking,
+  regenerateActivationToken,
 } from "../services/booking.service";
 
 import { getRoomById } from "../services/room.service";
@@ -288,4 +289,53 @@ export const updateBookingStatusController = async (c: Context) => {
     pesan: 'Gagal memperbarui status pemesanan',
   }, 500)
 }
+}
+
+export const regenerateActivationTokenController = async (c: Context) => {
+  try {
+    const id = Number(c.req.param('id'))
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ pesan: 'ID pemesanan tidak valid' }, 400)
+    }
+
+    const result = await regenerateActivationToken(id)
+
+    return c.json({
+      pesan: 'Token aktivasi baru berhasil dibuat',
+      activationToken: result.activationToken,
+      expiresAt: result.expiresAt,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      const errors: Record<string, { pesan: string; status: 400 | 404 | 409 }> = {
+        BOOKING_NOT_FOUND: {
+          pesan: 'Pemesanan tidak ditemukan',
+          status: 404,
+        },
+        BOOKING_NOT_APPROVED: {
+          pesan: 'Token hanya tersedia untuk pemesanan yang sudah disetujui',
+          status: 400,
+        },
+        TENANT_NOT_FOUND: {
+          pesan: 'Akun Tenant untuk pemesanan ini tidak ditemukan',
+          status: 404,
+        },
+        ACCOUNT_ALREADY_ACTIVATED: {
+          pesan: 'Akun Tenant sudah diaktivasi, token tidak diperlukan lagi',
+          status: 409,
+        },
+      }
+
+      const knownError = errors[error.message]
+
+      if (knownError) {
+        return c.json({ pesan: knownError.pesan }, knownError.status)
+      }
+    }
+
+    console.error(error)
+
+    return c.json({ pesan: 'Gagal membuat token aktivasi' }, 500)
+  }
 }

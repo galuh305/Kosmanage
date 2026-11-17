@@ -6,6 +6,7 @@ import {
   getBookingDetailController,
   createBookingController,
   updateBookingStatusController,
+  regenerateActivationTokenController,
 } from '../controllers/booking.controller'
 
 import {
@@ -39,6 +40,14 @@ bookingRoutes.patch(
   authMiddleware,
   ownerMiddleware,
   updateBookingStatusController
+)
+
+// Buat token aktivasi baru (selama akun Tenant belum diaktivasi)
+bookingRoutes.post(
+  '/:id/activation-token',
+  authMiddleware,
+  ownerMiddleware,
+  regenerateActivationTokenController
 )
 
 export default bookingRoutes

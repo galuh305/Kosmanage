@@ -45,14 +45,18 @@ function Login() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-8">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-sky-100 px-4 py-8">
+      {/* Dekorasi background */}
+      <div className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-blue-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-sky-200/50 blur-3xl" />
+
+      <div className="animate-fade-up relative w-full max-w-md rounded-3xl border border-white bg-white/90 p-8 shadow-xl shadow-blue-100/60 backdrop-blur sm:p-10">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white">
-            <LockKeyhole size={27} />
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-200">
+            <LockKeyhole size={26} />
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
             Login KosManage
           </h1>
 
@@ -63,19 +67,22 @@ function Login() {
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               Email
             </label>
 
-            <div className="flex items-center rounded-lg border border-slate-300 px-3 focus-within:border-blue-500">
-              <Mail size={18} className="text-slate-400" />
+            <div className="group flex items-center rounded-xl border border-slate-200 bg-white px-3.5 transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 hover:border-slate-300">
+              <Mail
+                size={18}
+                className="text-slate-400 transition-colors group-focus-within:text-blue-600"
+              />
 
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukkan email"
-                className="w-full border-0 px-3 py-3 text-sm outline-none"
+                className="w-full border-0 bg-transparent px-3 py-3 text-sm outline-none"
                 autoComplete="username"
                 required
               />
@@ -83,19 +90,22 @@ function Login() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               Password
             </label>
 
-            <div className="flex items-center rounded-lg border border-slate-300 px-3 focus-within:border-blue-500">
-              <LockKeyhole size={18} className="text-slate-400" />
+            <div className="group flex items-center rounded-xl border border-slate-200 bg-white px-3.5 transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 hover:border-slate-300">
+              <LockKeyhole
+                size={18}
+                className="text-slate-400 transition-colors group-focus-within:text-blue-600"
+              />
 
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan password"
-                className="w-full border-0 px-3 py-3 text-sm outline-none"
+                className="w-full border-0 bg-transparent px-3 py-3 text-sm outline-none"
                 autoComplete="current-password"
                 required
               />
@@ -103,7 +113,7 @@ function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-slate-400 hover:text-slate-700"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
@@ -114,7 +124,10 @@ function Login() {
           </div>
 
           {error && (
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div
+              role="alert"
+              className="animate-pop-in rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600"
+            >
               {error}
             </div>
           )}
@@ -122,20 +135,23 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
           >
+            {loading && (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+            )}
             {loading ? "Memproses login..." : "Masuk"}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-7 border-t border-slate-100 pt-6 text-center">
           <p className="text-sm text-slate-500">
             Sudah mendapatkan persetujuan booking?
           </p>
 
           <Link
             to="/activate"
-            className="mt-2 inline-block text-sm font-semibold text-blue-600 transition hover:text-blue-700"
+            className="mt-2 inline-block text-sm font-semibold text-blue-600 transition hover:text-blue-700 hover:underline hover:underline-offset-4"
           >
             Aktivasi Akun Tenant
           </Link>

@@ -122,7 +122,7 @@ function RoomSection() {
         </div>
 
         {/* Search and Filter */}
-        <div className="mb-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-10 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-5">
           <div className="grid gap-4 md:grid-cols-3">
             {/* Search */}
             <div className="relative md:col-span-1">
@@ -136,7 +136,7 @@ function RoomSection() {
                 placeholder="Cari nama atau tipe kamar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 py-3 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/60 py-3 pl-12 pr-4 outline-none transition hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
               />
             </div>
 
@@ -144,7 +144,7 @@ function RoomSection() {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-blue-500"
+              className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 outline-none transition hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
             >
               <option value="Semua">Semua Tipe Kamar</option>
 
@@ -159,7 +159,7 @@ function RoomSection() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-blue-500"
+              className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 outline-none transition hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
             >
               <option value="Semua">Semua Status</option>
               <option value="AVAILABLE">Tersedia</option>
@@ -172,8 +172,28 @@ function RoomSection() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="py-16 text-center text-slate-500">
-            Sedang mengambil data kamar...
+          <div
+            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="sr-only">Sedang mengambil data kamar...</span>
+
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
+                <div className="h-64 bg-slate-100" />
+                <div className="space-y-4 p-6">
+                  <div className="h-3 w-24 rounded-full bg-slate-100" />
+                  <div className="h-5 w-3/4 rounded-full bg-slate-100" />
+                  <div className="h-7 w-1/2 rounded-full bg-slate-100" />
+                  <div className="h-3 w-full rounded-full bg-slate-100" />
+                  <div className="h-3 w-5/6 rounded-full bg-slate-100" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -187,14 +207,15 @@ function RoomSection() {
         {/* Room Cards */}
         {!isLoading && !error && (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredRooms.map((room) => {
+            {filteredRooms.map((room, index) => {
               const price = Number(room.price ?? room.roomType.basePrice);
 
               return (
                 <Link
                   to={`/kamar/${room.id}`}
                   key={room.id}
-                  className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl"
+                  style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
+                  className="animate-fade-up group block overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-xl"
                 >
                   {/* Image Placeholder */}
                   {/* Room Image */}
@@ -217,12 +238,12 @@ function RoomSection() {
                       </div>
                     )}
 
-                    <div className="absolute left-4 top-4 rounded-lg bg-white px-3 py-2 text-xs font-bold tracking-wide text-blue-700 shadow">
+                    <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold tracking-wide text-blue-700 shadow-sm backdrop-blur">
                       {room.roomType.name}
                     </div>
 
                     <div
-                      className={`absolute right-4 top-4 rounded-lg px-3 py-2 text-xs font-bold ${getStatusStyle(
+                      className={`absolute right-4 top-4 rounded-full px-3 py-1.5 text-xs font-bold shadow-sm ${getStatusStyle(
                         room.status,
                       )}`}
                     >
@@ -300,7 +321,10 @@ function RoomSection() {
                           ? "Siap dihuni"
                           : "Tidak tersedia"}
 
-                        <ArrowUpRight size={17} />
+                        <ArrowUpRight
+                          size={17}
+                          className="transition duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        />
                       </span>
                     </div>
                   </div>

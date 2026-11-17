@@ -20,6 +20,16 @@ export type Booking = {
   createdAt: string
   updatedAt: string
 
+  user?: {
+    id: number
+    name: string
+    email: string
+    phone: string | null
+    role: string
+    mustChangePassword?: boolean
+    activationExpiresAt?: string | null
+  } | null
+
   room: {
     id: number
     roomNumber: string
@@ -139,6 +149,42 @@ export const createBooking = async (
   if (!response.ok || !result.data) {
     throw new Error(
       result.pesan || 'Gagal mengajukan pemesanan'
+    )
+  }
+
+  return result
+}
+
+export type ActivationTokenResult = {
+  pesan: string
+  activationToken: string
+  expiresAt: string
+}
+
+export const regenerateActivationToken = async (
+  id: number
+): Promise<ActivationTokenResult> => {
+  const token = localStorage.getItem('kosmanage_token')
+
+  if (!token) {
+    throw new Error('Token tidak ditemukan. Silakan login kembali.')
+  }
+
+  const response = await fetch(
+    `${API_URL}/bookings/${id}/activation-token`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  const result = await response.json()
+
+  if (!response.ok || !result.activationToken) {
+    throw new Error(
+      result.pesan || 'Gagal membuat token aktivasi'
     )
   }
 

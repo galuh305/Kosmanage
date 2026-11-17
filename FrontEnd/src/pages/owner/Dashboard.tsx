@@ -78,7 +78,10 @@ function Dashboard() {
         <>
           {/* Statistik utama */}
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div
+              className="animate-fade-up rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              style={{ animationDelay: "0ms" }}
+            >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">Total Kamar</p>
                 <DoorOpen className="text-blue-500" size={22} />
@@ -91,7 +94,10 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div
+              className="animate-fade-up rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              style={{ animationDelay: "60ms" }}
+            >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">Kamar Terisi</p>
                 <UserRound className="text-emerald-500" size={22} />
@@ -104,7 +110,10 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div
+              className="animate-fade-up rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              style={{ animationDelay: "120ms" }}
+            >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">Pemesanan</p>
                 <ClipboardList className="text-amber-500" size={22} />
@@ -117,7 +126,10 @@ function Dashboard() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div
+              className="animate-fade-up rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              style={{ animationDelay: "180ms" }}
+            >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">Total Pendapatan</p>
                 <CreditCard className="text-violet-500" size={22} />
@@ -170,8 +182,11 @@ function Dashboard() {
                     >
                       <div className="group relative flex h-52 w-full items-end justify-center">
                         <div
-                          className="w-full max-w-12 rounded-t-md bg-blue-500 transition-all duration-300 hover:bg-blue-700"
-                          style={{ height: `${height}%` }}
+                          className="w-full max-w-12 origin-bottom animate-grow-y rounded-t-lg bg-gradient-to-t from-blue-600 to-blue-400 transition-all duration-300 hover:from-blue-700 hover:to-blue-500"
+                          style={{
+                            height: `${height}%`,
+                            animationDelay: `${index * 40}ms`,
+                          }}
                           title={`${item.month}: ${formatRupiah(item.revenue)}`}
                         />
                       </div>

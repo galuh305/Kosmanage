@@ -26,7 +26,16 @@ app.use(
 app.use(
   '*',
   cors({
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'http://192.168.100.167:5173',
+      'http://10.171.189.183:5173',
+      'http://mybookhype:5173',
+      
+      
+      // Tambahkan IP frontend jika diperlukan
+    ],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   })
@@ -88,6 +97,8 @@ setInterval(() => {
 serve({
   fetch: app.fetch,
   port,
+  hostname: '0.0.0.0',
 })
 
-console.log(`Server KosManage berjalan di http://localhost:${port}`)
+console.log(`Server KosManage berjalan di http://0.0.0.0:${port}`)
+

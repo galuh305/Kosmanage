@@ -29,6 +29,8 @@ export const getAllBookings = async () => {
           email: true,
           phone: true,
           role: true,
+          mustChangePassword: true,
+          activationExpiresAt: true,
         },
       },
     },
@@ -426,3 +428,46 @@ if (invoices.length > 0) {
     }
   })
 }
+
+/**
+ * Membuat token aktivasi baru untuk Tenant yang belum mengaktivasi akun.
+ * Token asli tidak pernah disimpan (hanya hash-nya), sehingga token lama tidak
+ * bisa ditampilkan ulang. Token baru menggantikan token lama.
+ */
+export const regenerateActivationToken = async (bookingId: number) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { user: true },
+  });
+
+  if (!booking) {
+    throw new Error("BOOKING_NOT_FOUND");
+  }
+
+  if (booking.status !== "APPROVED") {
+    throw new Error("BOOKING_NOT_APPROVED");
+  }
+
+  if (!booking.user || booking.user.role !== "TENANT") {
+    throw new Error("TENANT_NOT_FOUND");
+  }
+
+  if (!booking.user.mustChangePassword) {
+    throw new Error("ACCOUNT_ALREADY_ACTIVATED");
+  }
+
+  const activation = generateActivationToken();
+
+  await prisma.user.update({
+    where: { id: booking.user.id },
+    data: {
+      activationTokenHash: activation.tokenHash,
+      activationExpiresAt: activation.expiresAt,
+    },
+  });
+
+  return {
+    activationToken: activation.token,
+    expiresAt: activation.expiresAt,
+  };
+};

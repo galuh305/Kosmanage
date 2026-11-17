@@ -18,8 +18,8 @@ function Footer() {
 
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
+            <Link to="/" className="group flex w-fit items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-900/30">
                 <House size={26} />
               </div>
 
@@ -48,25 +48,25 @@ function Footer() {
 
             <ul className="mt-6 space-y-4 text-sm text-slate-400">
               <li>
-                <a href="#beranda" className="transition hover:text-blue-400">
+                <a href="#beranda" className="inline-block transition duration-200 hover:translate-x-1 hover:text-blue-400">
                   Beranda
                 </a>
               </li>
 
               <li>
-                <a href="#kamar" className="transition hover:text-blue-400">
+                <a href="#kamar" className="inline-block transition duration-200 hover:translate-x-1 hover:text-blue-400">
                   Daftar Kamar
                 </a>
               </li>
 
               <li>
-                <a href="#fasilitas" className="transition hover:text-blue-400">
+                <a href="#fasilitas" className="inline-block transition duration-200 hover:translate-x-1 hover:text-blue-400">
                   Fasilitas
                 </a>
               </li>
 
               <li>
-                <Link to="/login" className="transition hover:text-blue-400">
+                <Link to="/login" className="inline-block transition duration-200 hover:translate-x-1 hover:text-blue-400">
                   Login
                 </Link>
               </li>

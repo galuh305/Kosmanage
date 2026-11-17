@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -24,26 +23,29 @@ function Hero() {
 
         {/* Konten kiri */}
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm">
+          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm">
             <MapPin size={16} />
             Sistem Informasi Manajemen Kos
           </div>
 
-          <h1 className="mt-7 text-4xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+          <h1 className="animate-fade-up mt-7 text-4xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
+          style={{ animationDelay: "80ms" }}>
             Temukan Kamar Kos
-            <span className="block text-blue-600">
+            <span className="block bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
               yang Tepat
             </span>
             untuk Kebutuhanmu
           </h1>
 
-          <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
+          <p className="animate-fade-up mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg"
+          style={{ animationDelay: "160ms" }}>
             Cari informasi kamar, lihat fasilitas, dan ajukan
             pemesanan kos dengan lebih mudah melalui KosManage.
           </p>
 
           {/* Tombol */}
-          <div className="mt-9 flex flex-wrap gap-4">
+          <div className="animate-fade-up mt-9 flex flex-wrap gap-4"
+          style={{ animationDelay: "240ms" }}>
             <a
               href="#kamar"
               className="group flex items-center gap-3 rounded-xl bg-blue-600 px-7 py-4 font-semibold text-white shadow-xl shadow-blue-200 transition duration-300 hover:-translate-y-1 hover:bg-blue-700"
@@ -58,16 +60,19 @@ function Hero() {
 
             <Link
               to="/login"
-              className="rounded-xl border border-slate-200 bg-white px-7 py-4 font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600"
+              className="rounded-xl border border-slate-200 bg-white px-7 py-4 font-semibold text-slate-700 shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:text-blue-600 hover:shadow-md"
             >
               Masuk Akun
             </Link>
           </div>
 
           {/* Keunggulan */}
-          <div className="mt-12 grid grid-cols-3 gap-4 border-t border-blue-100 pt-8">
-            <div>
-              <Zap size={25} className="text-blue-600" />
+          <div className="animate-fade-up mt-12 grid grid-cols-3 gap-4 border-t border-blue-100 pt-8"
+          style={{ animationDelay: "320ms" }}>
+            <div className="group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-blue-600 group-hover:text-white">
+                <Zap size={22} />
+              </div>
               <h3 className="mt-3 text-sm font-bold text-slate-800">
                 Praktis
               </h3>
@@ -76,8 +81,10 @@ function Hero() {
               </p>
             </div>
 
-            <div>
-              <ShieldCheck size={25} className="text-blue-600" />
+            <div className="group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-blue-600 group-hover:text-white">
+                <ShieldCheck size={22} />
+              </div>
               <h3 className="mt-3 text-sm font-bold text-slate-800">
                 Terpercaya
               </h3>
@@ -86,8 +93,10 @@ function Hero() {
               </p>
             </div>
 
-            <div>
-              <Headset size={25} className="text-blue-600" />
+            <div className="group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-blue-600 group-hover:text-white">
+                <Headset size={22} />
+              </div>
               <h3 className="mt-3 text-sm font-bold text-slate-800">
                 Responsif
               </h3>
@@ -99,21 +108,22 @@ function Hero() {
         </div>
 
         {/* Gambar kanan */}
-        <div className="relative">
+        <div className="animate-fade-up relative"
+          style={{ animationDelay: "200ms" }}>
           <div className="absolute -inset-4 rounded-[2rem] bg-blue-200/40 blur-2xl" />
 
-          <div className="relative overflow-hidden rounded-[2rem] border-8 border-white shadow-2xl">
+          <div className="group relative overflow-hidden rounded-[2rem] border-8 border-white shadow-2xl">
             <img
               src="../../../public/kos.jpg"
               alt="Bangunan kos KosManage"
-              className="h-[350px] w-full object-cover sm:h-[450px] lg:h-[500px]"
+              className="h-[350px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[450px] lg:h-[500px]"
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
           </div>
 
           {/* Informasi mengambang */}
-          <div className="absolute -bottom-7 -left-5 flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-xl sm:-left-10">
+          <div className="animate-float absolute -bottom-7 -left-5 flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-xl sm:-left-10">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
               <Users size={25} />
             </div>
@@ -128,7 +138,7 @@ function Hero() {
             </div>
           </div>
 
-          <div className="absolute -right-3 top-8 rounded-xl bg-white px-4 py-3 shadow-lg sm:-right-5">
+          <div className="absolute -right-3 top-8 rounded-xl bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-right-5">
             <p className="text-xs font-semibold text-blue-600">
               KosManage
             </p>
